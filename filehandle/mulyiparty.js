@@ -38,7 +38,9 @@ const multiparty_upload = function multiparty_upload(req, auto) {
     let config = {
         maxFieldsSize: 200 * 1024 * 1024,
     };
-    
+    if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir)
+    }
     if (auto) config.uploadDir = uploadDir;
     return new Promise(async (resolve, reject) => {
         await delay();
