@@ -116,7 +116,6 @@ app.post('/upload_single_name', async (req, res) => {
     
 });
 
-
 // 文件分快上传
 app.post('/upload_chunk', async (req, res) => {
     try {
@@ -125,12 +124,19 @@ app.post('/upload_chunk', async (req, res) => {
             filename = (fields.filename && fields.filename[0]) || "",
             path = '',
             isExists = false;
-        
+        // 旧版处理 整个文件作为md5加密内容
         let [, HASH] = /^([^_]+)_(\d+)/.exec(filename)
         path = `${multiparty.uploadDir}/${HASH}`
+
+        // 新版处理 把真个文件按照md5分片加密 
+        // path = multiparty.temporaryDirectory
         !fs.existsSync(path) ? fs.mkdirSync(path) : null
-        
+
+        // 旧版处理 整个文件作为md5加密内容
         path = `${uploadDir}/${HASH}/${filename}`;
+
+        // 新版处理 把真个文件按照md5分片加密 
+        // path = `${path}${filename}`
         isExists = await multiparty.exists(path);
 
         if (isExists) {
@@ -182,8 +188,11 @@ app.get('/upload_already', async (req, res) => {
 
 // 对上传的切片合并
 app.post('/upload_merge', async (req, res) => {
-    let { HASH, count } = req.body;
+    let { HASH, count, filename } = req.body;
+    // let name = multiparty.temporaryDirectory
+    // console.log(name, '上传的文件名或者哈希');
     try {
+        // 如果传了HASH 用HASH 作为文件名 传了filename用filename做文件名
         let { filename, path } = await merge(HASH, count)
         res.send({
             code: 0,
@@ -194,7 +203,7 @@ app.post('/upload_merge', async (req, res) => {
     } catch (error) {
         res.send({
             code: 1,
-            codeText: err
+            codeText: error
         });
     }
 })

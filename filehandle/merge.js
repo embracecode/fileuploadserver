@@ -1,16 +1,17 @@
 const multiparty = require('./mulyiparty')
 const fs = require('fs')
 
-const merge = (HASH, count) => {
+const merge = (name, count) => {
     return new Promise(async (resolve, reject) => {
-        let path = `${multiparty.uploadDir}/${HASH}`,
+        let path = `${multiparty.uploadDir}/${name}`,
+        // let path = name
             fileList = [],
             suffix,
             isExists
         isExists = await multiparty.exists(path)
 
         if (!isExists) {
-            reject('HASH path is not found!')
+            reject('filename path is not found!')
             return
         }
 
@@ -27,13 +28,13 @@ const merge = (HASH, count) => {
         })
         sortfileList.forEach(filesplic => {
             !suffix ? suffix = /\.([0-9a-zA-Z]+)$/.exec(filesplic)[1] : null;
-            fs.appendFileSync(`${multiparty.uploadDir}/${HASH}.${suffix}`, fs.readFileSync(`${path}/${filesplic}`));
+            fs.appendFileSync(`${multiparty.uploadDir}/${name}.${suffix}`, fs.readFileSync(`${path}/${filesplic}`));
             fs.unlinkSync(`${path}/${filesplic}`);
         })
         fs.rmdirSync(path)
         resolve({
-            path: `${multiparty.uploadDir}/${HASH}.${suffix}`,
-            filename: `${HASH}.${suffix}`
+            path: `${multiparty.uploadDir}/${name}.${suffix}`,
+            filename: `${name}.${suffix}`
         });
     })
 }

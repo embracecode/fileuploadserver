@@ -33,6 +33,10 @@ const exists = function exists(path) {
 const uploadDir = `${process.cwd()}/upload`;
 // const uploadDir = path.join(__dirname, '../upload')
 
+// 创建个临时文件夹用于切片合成
+let temporaryDirectory = `${uploadDir}/${Date.now()}`;
+
+
 const multiparty_upload = function multiparty_upload(req, auto) {
     typeof auto !== "boolean" ? auto = false : null;
     let config = {
@@ -64,4 +68,5 @@ module.exports = {
     delay,
     exists,
     uploadDir,
+    temporaryDirectory
 }
